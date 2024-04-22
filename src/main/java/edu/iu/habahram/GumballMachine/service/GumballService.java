@@ -19,17 +19,32 @@ public class GumballService implements IGumballService{
         this.gumballRepository = gumballRepository;
     }
 
-    @Override
-    public TransitionResult insertQuarter(String id) throws IOException {
+    private TransitionResult operate(String id, String operation) throws IOException {
         GumballMachineRecord record = gumballRepository.findById(id);
         IGumballMachine machine = new GumballMachine(record.getId(), record.getState(), record.getCount());
-        TransitionResult result = machine.insertQuarter();
+        TransitionResult result = null;
+        switch(operation) {
+            case "insertQuarter":
+                result = machine.insertQuarter();
+                break;
+            case "ejectQuarter":
+                result = machine.ejectQuarter();
+                break;
+            case "turnCrank":
+                result = machine.turnCrank();
+                break;
+        }
         if(result.succeeded()) {
             record.setState(result.stateAfter());
             record.setCount(result.countAfter());
             save(record);
         }
         return result;
+    }
+
+    @Override
+    public TransitionResult insertQuarter(String id) throws IOException {
+        return operate(id, "insertQuarter");
     }
 
     @Override
