@@ -37,6 +37,6 @@ jobs:
       - name: Build and push the image
         run: |
           docker login --username juntaochi --password ${{secrets.ACCESS_TOKEN}} ghcr.io
-          docker build -t ghcr.io/juntaochi/Gumball-Machine:latest --file Dockerfile .  
-          docker push ghcr.io/juntaochi/Gumball-Machine:latest 
+          docker build -t ghcr.io/juntaochi/gumball-machine:latest --file Dockerfile .  
+          docker push ghcr.io/juntaochi/gumball-machine:latest 
 
