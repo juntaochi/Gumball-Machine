@@ -1,9 +1,6 @@
 package edu.iu.habahram.GumballMachine.service;
 
-import edu.iu.habahram.GumballMachine.model.GumballMachine;
-import edu.iu.habahram.GumballMachine.model.GumballMachineRecord;
-import edu.iu.habahram.GumballMachine.model.IGumballMachine;
-import edu.iu.habahram.GumballMachine.model.TransitionResult;
+import edu.iu.habahram.GumballMachine.model.*;
 import edu.iu.habahram.GumballMachine.repository.IGumballRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +16,21 @@ public class GumballService implements IGumballService{
         this.gumballRepository = gumballRepository;
     }
 
-    @Override
-    public TransitionResult insertQuarter(String id) throws IOException {
+    private TransitionResult operate(String id, Transition operation) throws IOException {
         GumballMachineRecord record = gumballRepository.findById(id);
-        IGumballMachine machine = new GumballMachine(record.getId(), record.getState(), record.getCount());
-        TransitionResult result = machine.insertQuarter();
+        IGumballMachine machine = new GumballMachine2(record.getId(), record.getState(), record.getCount());
+        TransitionResult result = null;
+        switch(operation) {
+            case INSERT_QUARTER:
+                result = machine.insertQuarter();
+                break;
+            case EJECT_QUARTER:
+                result = machine.ejectQuarter();
+                break;
+            case TURN_CRANK:
+                result = machine.turnCrank();
+                break;
+        }
         if(result.succeeded()) {
             record.setState(result.stateAfter());
             record.setCount(result.countAfter());
@@ -33,13 +40,18 @@ public class GumballService implements IGumballService{
     }
 
     @Override
-    public TransitionResult ejectQuarter(String id) {
-        return null;
+    public TransitionResult insertQuarter(String id) throws IOException {
+        return operate(id, Transition.INSERT_QUARTER);
     }
 
     @Override
-    public TransitionResult turnCrank(String id) {
-        return null;
+    public TransitionResult ejectQuarter(String id) throws IOException {
+        return operate(id, Transition.EJECT_QUARTER);
+    }
+
+    @Override
+    public TransitionResult turnCrank(String id) throws IOException {
+        return operate(id, Transition.TURN_CRANK);
     }
 
     
